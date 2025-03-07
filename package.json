@@ -1,0 +1,26 @@
+{
+  "name": "cadastro",
+  "version": "1.0.0",
+  "description": "Simulação de um sistema de cadastro de clientes",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clxsilva/cadastro.git"
+  },
+  "author": "Claudio Silva",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/clxsilva/cadastro/issues"
+  },
+  "homepage": "https://github.com/clxsilva/cadastro#readme",
+  "devDependencies": {
+    "electron": "^35.0.0"
+  },
+  "dependencies": {
+    "mongoose": "^8.12.1"
+  }
+}
