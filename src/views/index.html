@@ -6,12 +6,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Impedir a execução de scripts externos -->
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline'">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="../public/css/bootstrap.min.css">
+    <!-- CSS Personalizado ATENÇÃO!!! Sempre após o csss do bootstrap -->
+    <link rel="stylesheet" href="../public/css/style.css">
     <!-- Título da janela -->
     <title>Cadastro</title>
 </head>
 
 <body>
-    <h1>Hello Cadastro</h1>
+    <div class="container">
+        <h1>Hello electron</h1>
+        <button type="button" class="btn btn-primary">Hello Bootstrap</button>
+    </div>
+
+    <footer>
+        <p id="dataAtual"></p>
+        <img src="../public/img/dboff.png" alt="ícone banco de dados">
+    </footer>
+
+    <!-- Bootstrap -->
+    <script src="../public/js/bootstrap.min.js"></script>
+
+    <!-- Processo de renderização -->
+    <script src="renderer.js"></script>
 </body>
 
 </html>
