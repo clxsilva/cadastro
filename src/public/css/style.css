@@ -12,6 +12,114 @@ body {
     font-family: "Questrial";
 }
 
+body {
+    font-family: Arial, sans-serif;
+    background-color: #027373;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background-color: #004d4d;
+    padding: 20px;
+    border-radius: 10px;
+    width: 900px;
+    color: white;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Distribui os campos em duas colunas */
+    gap: 15px; /* Aumenta o espaçamento entre os campos */
+}
+
+
+.form-grid .form-grid {
+    gap: 20px; /* Aumenta o espaçamento entre as seções de "Número/Bairro" e "Cidade/UF" */
+}
+
+label {
+    font-weight: bold;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.image-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid white;
+    padding: 10px;
+}
+
+
+.button-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+button {
+    background-color: #027373;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Ajusta a estrutura de número/bairro e cidade/UF */
+.form-grid > div {
+    margin-right: 20px;
+}
+
+#cep label, #telefone label {
+    padding-top: 10px; /* Desce o texto para mais baixo */
+    margin-top: 20px; /* Adiciona espaço acima dos campos */
+    margin-bottom: 20px; /* Mantém o espaçamento abaixo também */
+}
+
+
+#preview {
+    width: 120px;
+    height: 150px;
+    background-color: white;
+}
+
+/* Ajusta a borda e o espaçamento dos campos Endereço, E-mail e Observações */
+/* Diminui a largura dos campos Endereço, E-mail e Observações */
+.input-large {
+    width: 100%; /* Garante que os campos tenham largura total dentro do grid */
+    max-width: none; /* Remove qualquer limitação de largura anterior */
+    padding: 10px;
+    border: 1px solid white;
+    border-radius: 5px;
+    width: 850px;
+}
+
+/* Estilo para o campo com erro */
+input.error {
+    border-color: red;
+}
+
+/* Estilo para a mensagem de erro */
+.error-message {
+    color: red;
+    font-size: 0.875rem;
+    margin-top: 5px;
+}
+
 /** Rodapé 8**/
 footer {
     background-color: #e15a1f;
