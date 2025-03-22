@@ -95,3 +95,5 @@ function validarFormulario() {
     }
     return true; // Permite o envio do formulário se tudo estiver correto
 }
+
+

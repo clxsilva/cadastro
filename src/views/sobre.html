@@ -3,13 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../public/css/style.css">
+    <!-- Impedir a execução de scripts externos -->
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline'">
     <title>Sobre</title>
 </head>
 <body>
-    <h2>Cadastro</h2>
-    <h3>Cadastro de Clientes</h3>
-    <h4>Autor: Claudio Silva</h4>
-    <h4>Sob a licença MIT</h4>
-    <p>Versão 1.0</p>
+    <div class="container">
+        <section id="sobre">
+            <h2>Cadastro de Clientes</h2>
+            <h3>Cadastro</h3>
+            <h4>Autor: Claudio Silva</h4>
+            <h4>Sob a licença MIT</h4>
+            <P>Versão 1.0</P>   
+            <button type="button" onclick="fechar()">OK</button>
+        </section>
+    </div>
+
+    <!-- Renderizador de tela sobre-->
+     <script src="rendererSobre.js"></script>
 </body>
 </html>

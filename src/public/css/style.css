@@ -3,136 +3,89 @@
 /** importação de fontes off-line **/
 @font-face {
     font-family: Archivo_Narrow;
-    src: url(../Archivo_Narrow/ArchivoNarrow-Italic-VariableFont_wght.ttf);
-    font-family: Questrial;
-    src: url(../Questrial/Questrial-Regular.ttf);
+    src: url(../Archivo_Narrow/ArchivoNarrow-VariableFont_wght.ttf);
 }
 
+/* Variáveis para as cores das notas */
+:root {
+    --amarelo: #fff68f;
+    --azul: #add8e6;
+    --verde: #90ee90;
+    --rosa: #ffb6c1;
+    --laranja: #ffa07a;
+    --cinza: #6c757d;
+    --footer: #f3f3f3;
+}
+ 
+/* CSS Reset */
+* {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-sizing: border-box;
+}
+ 
 body {
-    font-family: "Questrial";
+    font-family: "Fredoka";
+    font-size: 1em;
 }
-
-body {
-    font-family: Arial, sans-serif;
-    background-color: #027373;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
-
+ 
 .container {
-    background-color: #004d4d;
-    padding: 20px;
-    border-radius: 10px;
-    width: 900px;
-    color: white;
+    padding: 15px;
 }
 
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* Distribui os campos em duas colunas */
-    gap: 15px; /* Aumenta o espaçamento entre os campos */
-}
-
-
-.form-grid .form-grid {
-    gap: 20px; /* Aumenta o espaçamento entre as seções de "Número/Bairro" e "Cidade/UF" */
-}
-
-label {
-    font-weight: bold;
-}
-
-input,
-select,
-textarea {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-.image-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border: 1px solid white;
-    padding: 10px;
-}
-
-
-.button-container {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
-}
-
+/* Botões */
 button {
-    background-color: #027373;
-    color: white;
-    border: none;
-    padding: 10px 15px;
+    padding: 5px 15px;
+    border: 1px solid var(--cinza);
     border-radius: 5px;
     cursor: pointer;
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
 }
 
-/* Ajusta a estrutura de número/bairro e cidade/UF */
-.form-grid > div {
-    margin-right: 20px;
-}
-
-#cep label, #telefone label {
-    padding-top: 10px; /* Desce o texto para mais baixo */
-    margin-top: 20px; /* Adiciona espaço acima dos campos */
-    margin-bottom: 20px; /* Mantém o espaçamento abaixo também */
-}
-
-
-#preview {
-    width: 120px;
-    height: 150px;
-    background-color: white;
-}
-
-/* Ajusta a borda e o espaçamento dos campos Endereço, E-mail e Observações */
-/* Diminui a largura dos campos Endereço, E-mail e Observações */
-.input-large {
-    width: 100%; /* Garante que os campos tenham largura total dentro do grid */
-    max-width: none; /* Remove qualquer limitação de largura anterior */
-    padding: 10px;
-    border: 1px solid white;
-    border-radius: 5px;
-    width: 850px;
-}
-
-/* Estilo para o campo com erro */
-input.error {
-    border-color: red;
-}
-
-/* Estilo para a mensagem de erro */
-.error-message {
-    color: red;
-    font-size: 0.875rem;
-    margin-top: 5px;
-}
-
-/** Rodapé 8**/
+/** Rodapé **/
 footer {
-    background-color: #e15a1f;
     width: 100%;
-    height: 25px;
-    padding: 3px;
+    height: 35px;
+    background-color: var(--cinza);
     display: flex;
+    align-items: center;
     justify-content: space-between;
+    padding: 5px;
     position: fixed;
     bottom: 0;
 }
-
+ 
 footer p {
-    color: #fff;
-    font-size: 1.0em;
+    font-size: 1.1em;
+    margin: 5px 0px 0px 5px;
+}
+
+/* Sobre */
+#sobre h3 { 
+    color: var(--cinza);
+    font-weight: 500;
+}
+
+/* Janela Nova nota*/
+.novaNota {
+    display: flex;
+    flex-direction: column;
+}
+
+.novaNota input{
+    width: 355px;
+    padding: 10px;
+    margin: 10px 0px 20px 0px;
+    border: 1px solid var(--cinza);
+    border-radius: 5px;
+}
+
+.novaNota select {
+    margin-top: 10px;
+    width: 150px;
+    padding: 1px solid var(--cinza);
+    border-radius: 5px;
 }
