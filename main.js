@@ -21,8 +21,10 @@ const createWindow = () => {
   // definindo o tema da janela claro ou escuro
   nativeTheme.themeSource = 'light'
   win = new BrowserWindow({
-    width: 1010,
-    height: 720,
+    width: 1200,
+    height: 1090,
+    minWidth: 800,
+    minHeight: 600,
     //frame: false, // totem de pedido
     //resizable: false, // retira o redimensionamento
     //minimizable: false, // retira a opção de minimizar
@@ -151,7 +153,7 @@ const template = [
     label: 'Notas',
     submenu: [
       {
-        label: 'Criar nota',
+        label: 'Cadastro',
         accelerator: 'Ctrl+N',
         click: () => noteWindow()
       },

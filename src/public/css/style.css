@@ -35,7 +35,7 @@ body {
 }
 
 /* Botões */
-button {
+.butun {
     padding: 5px 15px;
     border: 1px solid var(--cinza);
     border-radius: 5px;
@@ -89,3 +89,4 @@ footer p {
     padding: 1px solid var(--cinza);
     border-radius: 5px;
 }
+
