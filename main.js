@@ -7,7 +7,8 @@ console.log("Electron - Processo principal")
 // Menu (definir um menu personalizado)
 // shell (acessar links externos no navegador padrão)
 // ipcMain (permite estabelecer uma comunicação entre processos (IPC) main.js <=> renderer.js)
-const { app, BrowserWindow, nativeTheme, Menu, shell, ipcMain } = require('electron/main')
+// dialog: módulo electron para ativar caixa de mensagens
+const { app, BrowserWindow, nativeTheme, Menu, shell, ipcMain, dialog } = require('electron/main')
 
 // ativação do preload.js (importação do path)
 const path = require('node:path')
@@ -150,10 +151,10 @@ app.commandLine.appendSwitch('log-level', '3')
 // Template do menu
 const template = [
   {
-    label: 'Notas',
+    label: 'Cadastro',
     submenu: [
       {
-        label: 'Cadastro',
+        label: 'Relatório',
         accelerator: 'Ctrl+N',
         click: () => noteWindow()
       },
@@ -209,3 +210,38 @@ const template = [
     ]
   }
 ]
+
+// ===================================================
+// == CRUD Create ====================================
+
+// Recebimento do objeto que contém os dados da nota
+//ipcMain.on('new-client', async (event, client) => {
+  // IMPORTANTE! Teste de recebimento do objeto - Passo 2
+ // console.log(stickyNote)
+  // Criar uma nova estrutura de dados para salvar no banco
+  // ATENÇÃO!!! Os atributos da estrutura precisam ser idênticos ao modelo e os valores são obtidos através do objeto stickynote
+  //const newNote = noteModel({
+ //   texto: stickyNote.textNote,
+  //  cor: stickyNote.colorNote
+  //})
+  // Salvar os dados do cliente no banco de dados (Passo 3: fluxo)
+  //await newClient.save()
+  // Confirmação de cliente adicionado ao banco (uso do dialog)
+  //dialog.showMessageBox({
+    //type: 'info',
+    //title: "Aviso",
+    //message: "Cliente adicionado com sucesso",
+    //buttons: ['OK']
+//}).then((result) => {
+  // Se o botão OK for pressionado
+  //if (resourceLimits.response === 0) {
+    // enviar um pedido para o renderizador limpar os campos (preload.js)
+  //  event.reply('reset-form')
+  //}
+//})
+  // Enviar ao renderizador um pedido para limpar os campos e setar o formulário com os padrões originais (foco no texto)
+  //event.reply('reset-form')
+//})
+
+// == Fim - CRUD Create ==============================
+// ===================================================

@@ -1,3 +1,16 @@
+// Capturar o foco na busca pelo nome do cliente
+// A constante foco obtém o elemento html (input) identifcado como 'nomec'
+const foco = document.getElementById('nome')
+
+// Iniciar a janela de clientes alterando as propriedades de alguns elementos
+document.addEventListener('DOMContentLoaded', () => {
+    // Foco na busca do nome
+    foco.focus()
+    // Desativar os botões
+    btnUpdate.disabled = true
+    btnDelete.disabled = true
+})
+
 function selecionarImagem() {
     let input = document.getElementById('imagem');
     let preview = document.getElementById('preview');
@@ -95,5 +108,4 @@ function validarFormulario() {
     }
     return true; // Permite o envio do formulário se tudo estiver correto
 }
-
 

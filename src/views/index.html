@@ -113,7 +113,6 @@
             /* Mantém o espaçamento abaixo também */
         }
 
-
         #preview {
             width: 120px;
             height: 150px;
@@ -144,8 +143,6 @@
             font-size: 0.875rem;
             margin-top: 5px;
         }
-
-        
     </style>
 </head>
 <div class="container">
@@ -222,8 +219,10 @@
 
 
         <div class="button-container">
-            <button type="submit">Cadastrar</button>
-            <button type="button" onclick="limparFormulario()">Limpar</button>
+            <button type="submit" id="btnCreate">Cadastrar</button>
+            <button type="submit" id="btnUpdate">Editar</button>
+            <button type="button" id="btnDelete">Excluir</button>
+            <button type="reset" id="btnReset" onclick="limparFormulario()"></button>
         </div>        
     </form>
 </div>

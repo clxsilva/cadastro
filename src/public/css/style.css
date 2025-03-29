@@ -90,3 +90,16 @@ footer p {
     border-radius: 5px;
 }
 
+/** index.html **/
+
+
+/**botao limpar**/
+#btnReset {
+    width: 48px;
+    height: 48px;
+    background-image: url('../img/cleanvass.png');
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    margin-left: 10px;
+}
