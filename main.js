@@ -13,6 +13,9 @@ const { app, BrowserWindow, nativeTheme, Menu, shell, ipcMain, dialog } = requir
 // ativação do preload.js (importação do path)
 const path = require('node:path')
 
+// importar o modelo
+const Client = require('./src/views/clienteModel.js');
+
 // importação dos metodos conectar a desconectar (modulo de conexão)
 const { conectar, desconectar } = require('./database.js')
 
@@ -214,34 +217,17 @@ const template = [
 // ===================================================
 // == CRUD Create ====================================
 
-// Recebimento do objeto que contém os dados da nota
-//ipcMain.on('new-client', async (event, client) => {
-  // IMPORTANTE! Teste de recebimento do objeto - Passo 2
- // console.log(stickyNote)
-  // Criar uma nova estrutura de dados para salvar no banco
-  // ATENÇÃO!!! Os atributos da estrutura precisam ser idênticos ao modelo e os valores são obtidos através do objeto stickynote
-  //const newNote = noteModel({
- //   texto: stickyNote.textNote,
-  //  cor: stickyNote.colorNote
-  //})
-  // Salvar os dados do cliente no banco de dados (Passo 3: fluxo)
-  //await newClient.save()
-  // Confirmação de cliente adicionado ao banco (uso do dialog)
-  //dialog.showMessageBox({
-    //type: 'info',
-    //title: "Aviso",
-    //message: "Cliente adicionado com sucesso",
-    //buttons: ['OK']
-//}).then((result) => {
-  // Se o botão OK for pressionado
-  //if (resourceLimits.response === 0) {
-    // enviar um pedido para o renderizador limpar os campos (preload.js)
-  //  event.reply('reset-form')
-  //}
-//})
-  // Enviar ao renderizador um pedido para limpar os campos e setar o formulário com os padrões originais (foco no texto)
-  //event.reply('reset-form')
-//})
+ipcMain.on('new-client', async (event, clientData) => {
+  try {
+    const newClient = new Client(clientData);
+    await newClient.save();
 
+    // Enviar resposta ao renderer.js
+    event.reply('client-saved', { sucess: true, message: "Cliente cadastrado!" });
+  } catch (error) {
+    console.error("Erro ao salvar cliente:", error);
+    event.reply('client-saved', { sucess: false, message: "Erro ao cadastrar cliente."});
+  }
+});
 // == Fim - CRUD Create ==============================
 // ===================================================
