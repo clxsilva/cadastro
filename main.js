@@ -8,6 +8,7 @@ console.log("Electron - Processo principal")
 // shell (acessar links externos no navegador padrão)
 // ipcMain (permite estabelecer uma comunicação entre processos (IPC) main.js <=> renderer.js)
 // dialog: módulo electron para ativar caixa de mensagens
+// shell (acessar links e aplicações externas)
 const { app, BrowserWindow, nativeTheme, Menu, shell, ipcMain, dialog } = require('electron/main')
 
 // ativação do preload.js (importação do path)
@@ -15,6 +16,12 @@ const path = require('node:path')
 
 // importar o modelo
 const Client = require('./src/views/clienteModel.js');
+
+// importação da biblioteca nativa do JS para manipular arquivos
+const fs = require('fs')
+
+// importação do pacote jspdf (arquivos pdf) npm install jspdf
+const { jspdf, default: jsPDF } = require('jspdf')
 
 // importação dos metodos conectar a desconectar (modulo de conexão)
 const { conectar, desconectar } = require('./database.js')
@@ -82,32 +89,6 @@ function aboutWindow() {
   })
 }
 
-// Janela nota
-let note
-function noteWindow() {
-  nativeTheme.themeSource = 'light'
-  // obter a janela principal
-  const mainWindow = BrowserWindow.getFocusedWindow()
-  // validação (se existir a janela principal)
-  if (mainWindow) {
-    note = new BrowserWindow({
-      width: 400,
-      height: 270,
-      autoHideMenuBar: true,
-      resizable: false,
-      minimizable: false,
-      // estabelecer uma relação hierárquica entre janelas
-      parent: mainWindow,
-      // criar uma janela modal (só retorna a principal quando encerrada)
-      modal: true,
-      webPreferences: {
-        preload: path.join(__dirname, 'preload.js')
-      }
-    })
-  }
-  note.loadFile('./src/views/nota.html')
-}
-
 // Inicialização da aplicação (assincronismo)
 app.whenReady().then(() => {
   createWindow()
@@ -159,7 +140,7 @@ const template = [
       {
         label: 'Relatório',
         accelerator: 'Ctrl+N',
-        click: () => noteWindow()
+        click: relatorioClientes()
       },
       {
         type: 'separator'
@@ -230,4 +211,31 @@ ipcMain.on('new-client', async (event, clientData) => {
   }
 });
 // == Fim - CRUD Create ==============================
+// ===================================================
+
+// ===================================================
+// == Relatório de Clientes ==========================
+async function relatorioClientes() {
+  try {
+    // ==============================================
+    //        Configuração do documento pdf
+    // ==============================================
+    // p (portrait) l (landscape)
+    const doc = new jsPDF('p', 'mm', 'a4')
+
+    // ==============================================
+    //   Abrir o arquivo pdf no sistema operacional
+    // ==============================================
+     // Definir o caminho do arquivo temporário e nome do arquivo com extensão .pdf (importante!)
+     const tempDir = app.getPath('temp')
+     const filePath = path.join(tempDir, 'clientes.pdf')
+     // salvar temporariamente o arquivo
+     doc.save(filePath)
+     // abrir o arquivo no aplicativo padrão de leitura de pdf do computador do usuário
+     shell.openPath(filePath)
+  } catch (error) {
+    console.log(error)
+  }
+}
+// == Fim - Relatório de Clientes ====================
 // ===================================================
