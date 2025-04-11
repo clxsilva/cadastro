@@ -4,241 +4,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Impedir a execução de scripts externos -->
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline'">
+    <!-- Título que será exibido na janela -->
+    <title>Cadastro de clientes</title>
     <!-- Bootstrap -->
-    <!-- <link rel="stylesheet" href="../public/css/bootstrap.min.css"> -->
-    <!-- CSS Personalizado ATENÇÃO!!! Sempre após o csss do bootstrap -->
+    <link rel="stylesheet" href="../public/css/bootstrap.min.css">
+    <!-- CSS personalizado -->
     <link rel="stylesheet" href="../public/css/style.css">
-    <!-- Título da janela -->
-    <title>Cadastro</title>
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #2c2929;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        .container {
-            background-color: #2c2929;
-            padding: 20px;
-            border-radius: 10px;
-            color: white;
-            flex-direction: column;
-            align-items: center;
-            overflow: hidden;
-            justify-content: center;
-            width: 900px;
-            height: 100%;
-            display: flex;
-            top: 50%;
-            left: 50%;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            /* Distribui os campos em duas colunas */
-            gap: 15px;
-            /* Aumenta o espaçamento entre os campos */
-        }
-
-
-        .form-grid .form-grid {
-            gap: 20px;
-            /* Aumenta o espaçamento entre as seções de "Número/Bairro" e "Cidade/UF" */
-        }
-
-        label {
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-
-        input,
-        select,
-        textarea {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .image-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            border: 1px solid white;
-            padding: 10px;
-        }
-
-        .button-container {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        button {
-            background-color: #ffffff;
-            color: rgb(0, 0, 0);
-            border: none;
-            padding: 15px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            width: auto;
-        }
-
-        /* Ajusta a estrutura de número/bairro e cidade/UF */
-        .form-grid>div {
-            margin-right: 20px;
-        }
-
-        #cep label,
-        #telefone label {
-            padding-top: 10px;
-            /* Desce o texto para mais baixo */
-            margin-top: 20px;
-            /* Adiciona espaço acima dos campos */
-            margin-bottom: 20px;
-            /* Mantém o espaçamento abaixo também */
-        }
-
-        #preview {
-            width: 120px;
-            height: 150px;
-            background-color: white;
-        }
-
-        /* Ajusta a borda e o espaçamento dos campos Endereço, E-mail e Observações */
-        /* Diminui a largura dos campos Endereço, E-mail e Observações */
-        .input-large {
-            width: 100%;
-            /* Garante que os campos tenham largura total dentro do grid */
-            max-width: none;
-            /* Remove qualquer limitação de largura anterior */
-            padding: 10px;
-            border: 1px solid white;
-            border-radius: 5px;
-            width: 850px;
-        }
-
-        /* Estilo para o campo com erro */
-        input.error {
-            border-color: red;
-        }
-
-        /* Estilo para a mensagem de erro */
-        .error-message {
-            color: red;
-            font-size: 0.875rem;
-            margin-top: 5px;
-        }
-    </style>
+    <!-- impedir a execução de scripts externos ou não autorizados -->
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline'">
 </head>
-<div class="container">
-    <h2>Ficha de Cadastro</h2>
-    <form onsubmit="return validarFormulario()">
-        <div class="form-grid">
-            <div class="image-container">
-                <div id="preview" style="width: 120px; height: 150px; background-color: white;"></div>
-                <input type="file" id="imagem" accept="image/*" onchange="selecionarImagem()">
-            </div>
-            <div>
-                <label for="nome">Nome*</label>
-                <input type="text" id="nome" required>
 
-                <div>
-                    <label for="cpf">CPF:</label>
-                    <input type="text" id="cpf" onblur="validarCPF()">
-                    <span id="cpf-error" class="error-message"></span> <!-- Espaço para a mensagem de erro -->
-                </div>
+<body>
+    <div class="container button">
+        <img src="../public/img/clientes.png" alt="clientes" title="Cadastro de clientes" onclick="client()">       
+    </div>
+    <footer>
+        <p id="dataAtual"></p>
+        <img src="../public/img/dboff.png" alt="dbicon" id="statusdb">
+    </footer>
 
-                <label for="data_nascimento">Data de Nascimento</label>
-                <input type="date" id="data_nascimento" required>
-
-                <label for="sexo">Sexo</label>
-                <select id="sexo" required>
-                    <option value="">Selecione</option>
-                    <option value="Masculino">Masculino</option>
-                    <option value="Feminino">Feminino</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="form-grid">
-            <div>
-                <label for="cep">CEP</label>
-                <input type="text" id="cep" pattern="\d{8}" title="Digite um CEP válido com 8 dígitos"
-                    onblur="buscarCep()" required>
-            </div>
-            <div>
-                <label for="telefone">Telefone</label>
-                <input type="text" id="telefone" pattern="\d{10,11}"
-                    title="Digite um telefone válido com 10 ou 11 dígitos" required>
-            </div>
-        </div>
-
-        <!-- Endereço colocado logo após o telefone -->
-        <label for="endereco">Endereço</label>
-        <input type="text" id="endereco" class="input-large" required>
-
-        <div class="form-grid">
-            <div>
-                <label for="numero">Número</label>
-                <input type="text" id="numero" required>
-            </div>
-            <div>
-                <label for="bairro">Bairro</label>
-                <input type="text" id="bairro" required>
-            </div>
-        </div>
-
-        <div class="form-grid">
-            <div>
-                <label for="cidade">Cidade</label>
-                <input type="text" id="cidade" required>
-            </div>
-            <div>
-                <label for="uf">UF</label>
-                <input type="text" id="uf" required>
-            </div>
-        </div>
-
-        <label for="email">E-mail</label>
-        <input type="email" id="email" class="input-large" required>
-
-
-        <div class="button-container">
-            <button type="submit" id="btnCreate">Cadastrar</button>
-            <button type="submit" id="btnUpdate">Editar</button>
-            <button type="button" id="btnDelete">Excluir</button>
-            <button type="reset" id="btnReset" onclick="limparFormulario()"></button>
-        </div>        
-    </form>
-</div>
-
-<footer>
-    <p id="dataAtual"></p>
-    <img src="../public/img/dboff.png" alt="ícone banco de dados" id="iconeDB">
-</footer>
-
-<!-- Bootstrap -->
-<script src="../public/js/bootstrap.min.js"></script>
-
-<!-- Processo de renderização -->
-<script src="renderer.js"></script>
-
-<script src="script.js"></script>
+    <!-- Bootstrap -->
+    <script src="../public/js/bootstrap.min.js"></script>
+    <!-- Scripts -->
+    <script src="../public/js/script.js"></script>
+    <!-- Renderizador -->
+    <script src="renderer.js"></script>
 </body>
 
 </html>
