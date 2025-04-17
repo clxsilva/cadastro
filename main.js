@@ -262,40 +262,74 @@ async function relatorioClientes() {
         // ================================================
         //          Configuração do documento pdf
         // ================================================
-        // p (portrait)  l (landscape)
-        const doc = new jsPDF('l', 'mm', 'a4')
 
+        // p (portrait)  l (landscape)
+        // a4 (210 mm x 297 mm)
+        const doc = new jsPDF('p', 'mm', 'a4')
 
         // inserir data atual no documento
         const dataAtual = new Date().toLocaleDateString('pt-BR')
-        // doc.setFontSize() tamanho da fonte
+        // doc.setFontSize() tamanho da fonte em ponto(= word)
         doc.setFontSize(10)
         // doc.text() escreve um texto no documento
-        doc.text(`Data: ${dataAtual}`, 135, 15) //(x,y(mm))
+        doc.text(`Data: ${dataAtual}`, 170, 15) //( x,y (mm))
         doc.setFontSize(18)
-        doc.text("Relatório de clientes", 15, 35)
+        doc.text("Relatório de clientes", 15, 30)
         doc.setFontSize(12)
-        let y = 60 // variável de apoio
+        let y = 50 //variável de apoio
+        // cabeçalho da tabela
         doc.text("Nome", 14, y)
         doc.text("Telefone", 85, y)
         doc.text("E-mail", 130, y)
         y += 5
         // desenhar uma linha
         doc.setLineWidth(0.5)
-        doc.line(10, y, 200, y) // (10 (início)___________ 200 (fim))
+        doc.line(10, y, 200, y) // (10 (inicio)_________ 200 (fim))
         y += 10
 
-        // =====================================================
-        //    Obter a listagem de clientes (ordem alfabética)
-        // =====================================================
+        // ================================================
+        //  Obter a listagem de clientes(ordem alfabética)
+        // ================================================
 
         const clientes = await clientModel.find().sort({ nomeCliente: 1 })
-        // teste de recebimento (Importante!)
-        console.log(clientes)
+        // teste de recimento (Importante!)
+        // console.log(clientes)
+        // popular o documento pdf com os clientes cadastrados
+        clientes.forEach((c) => {
+            // criar uma nova página se y > 280mm (A4 = 297mm)
+            if (y > 280) {
+                doc.addPage()
+                y = 20 //margem de 20mm para iniciar nova folha
+                // cabeçalho da tabela
+                doc.text("Nome", 14, y)
+                doc.text("Telefone", 85, y)
+                doc.text("E-mail", 130, y)
+                y += 5
+                // desenhar uma linha
+                doc.setLineWidth(0.5)
+                doc.line(10, y, 200, y) // (10 (inicio)_________ 200 (fim))
+                y += 10
+            }
+            doc.text(c.nomeCliente, 15, y)
+            doc.text(c.foneCliente, 85, y)
+            doc.text(c.emailCliente, 130, y)
+            y += 10
+        })
 
-        // =====================================================
-        //      Abrir o arquivo pdf no sistema operacional
-        // =====================================================
+        // ================================================
+        //         Numeração automática de páginas
+        // ================================================
+
+        const pages = doc.internal.getNumberOfPages()
+        for (let i = 1; i <= pages; i++) {
+            doc.setPage(i)
+            doc.setFontSize(10)
+            doc.text(`Página ${i} de ${pages}`, 105, 290, { align: 'center' })
+        }
+
+        // ================================================
+        //    Abrir o arquivo pdf no sistema operacional
+        // ================================================
 
         // Definir o caminho do arquivo temporário e nome do arquivo com extensão .pdf (importante!)
         const tempDir = app.getPath('temp')
@@ -311,23 +345,55 @@ async function relatorioClientes() {
 // == Fim - relatório de clientes =============================
 // ============================================================
 
+
 // ============================================================
 // == Crud Read ===============================================
 
-ipcMain.on('search-c', async (event, cliName) => {
-    // Teste de recebimento do nome do cliente (Passo 2)
+// validação da busca
+ipcMain.on('validate-search', () => {
+    dialog.showMessageBox({
+        type: 'warning',
+        title: 'Atenção',
+        message: 'Preencha o campo de busca',
+        buttons: ['OK']
+    })
+})
+
+ipcMain.on('search-name', async (event, cliName) => {
+    // teste de recebimento do nome do cliente (passo2)
     console.log(cliName)
     try {
-        // Passos 3 e 4 é a busca dos dados do cliente pelo nome
-        // RegExp (expressão regular 'i' -> insensitive (ignorar letras maiúsculas ou minúsculas))
+        // Passos 3 e 4 (busca dos dados do cliente pelo nome)
+        // RegExp (expressão regular 'i' -> insensitive (ignorar letra smaiúsculas ou minúsculas))
         const client = await clientModel.find({
             nomeCliente: new RegExp(cliName, 'i')
         })
-        // Teste da busca do cliente pelo nome (Passos 3 e 4)
+        // teste da busca do cliente pelo nome (passos 3 e 4)
         console.log(client)
-        // Enviar ao renderizador (rendererCliente) os dados do cliente (Passo 5)
-        // Observação: não esquecer de converter para string "JSON.stringfy"
-        event.reply('render-client', JSON.stringify(client))
+        // melhoria da experiência do usuário (se não existir um cliente cadastrado enviar uma mensagem ao usuário questionando se ele deseja cadastrar este novo cliente)
+        // se o vetor estiver vazio (lenght retorna o tamanho do vetor)
+        if (client.length === 0) {
+            // questionar o usuário ...
+            dialog.showMessageBox({
+                type: 'warning',
+                title: 'Aviso',
+                message: 'Cliente não cadastrado.\nDeseja cadastrar este cliente?',
+                defaultId: 0,
+                buttons: ['Sim', 'Não'] //[0, 1] defaultId: 0 = Sim
+            }).then((result) => {
+                // se o botão sim for pressionado
+                if (result.response === 0) {
+                    // enviar ao rendererCliente um pedido para recortar e copiar o nome do cliente do campo de busca para o campo nome (evitar que o usuário digite o nome novamente)
+                    event.reply('set-name')
+                } else {
+                    // enviar ao rendererCliente um pedido para limpar os campos (reutilzar a api do preload 'reset-form')
+                event.reply('reset-form')
+                }                
+            })
+        } else {
+            // enviar ao renderizador (rendererCliente) os dados do cliente (passo 5) OBS: não esquecer de converter para string "JSON.stringify"
+            event.reply('render-client', JSON.stringify(client))
+        }
     } catch (error) {
         console.log(error)
     }
