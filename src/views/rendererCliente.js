@@ -85,16 +85,21 @@ frmClient.addEventListener('submit', async (event) => {
 // == CRUD Read ===============================================
 
 // setar o nome do cliente para fazer um novo cadastro se a busca retornar que o cliente não está cadastrado.
-api.setName((args) => {
-    console.log("teste do IPC 'set-name'")
-    // "recortar" o nome da busca e setar no campo nome do form
-    let busca = document.getElementById('searchClient').value
-    // limpar o campo de busca (foco foi capturado de forma global)
-    foco.value=""
-    // foco no campo nome
-    nameClient.focus()    
-    // copiar o nome do cliente para o campo nome
-    nameClient.value = busca
+api.setSearch((event, searchValue) => {
+    foco.value = ""
+    const cleanValue = searchValue.replace(/[^\w]/g, '') // remove pontuação mas mantém letras
+
+    // Verifica se parece com um CPF (tem pelo menos 9 caracteres e começa com número)
+    const pareceCPF = /^\d{3,}[\w]*$/.test(cleanValue)
+
+    if (pareceCPF) {
+        cpfClient.value = cleanValue
+        cpfClient.focus()
+        cpfClient.style.border = '2px solid red'
+    } else {
+        nameClient.value = searchValue
+        nameClient.focus()
+    }
 })
 
 function searchName() {
@@ -151,3 +156,10 @@ api.resetForm((args) => {
 })
 // == Fim Reset Form ==========================================
 // ============================================================
+
+window.api.setCPF((event, cpf) => {
+    const cpfField = document.querySelector('#cpf')
+    cpfField.value = cpf
+    cpfField.focus()
+    cpfField.style.border = '2px solid red'
+})

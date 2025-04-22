@@ -207,7 +207,7 @@ ipcMain.on('new-client', async (event, client) => {
         // criar uma nova de estrutura de dados usando a classe modelo. Atenção! Os atributos precisam ser idênticos ao modelo de dados Clientes.js e os valores são definidos pelo conteúdo do objeto cliente
         const newClient = new clientModel({
             nomeCliente: client.nameCli,
-            cpfCliente: client.cpfCli,
+            cpfCliente: client.cpfCli.replace(/[^\d]/g, ''), // Remove a pontuação do CPF
             emailCliente: client.emailCli,
             foneCliente: client.phoneCli,
             cepCliente: client.cepCli,
@@ -359,14 +359,18 @@ ipcMain.on('validate-search', () => {
     })
 })
 
-ipcMain.on('search-name', async (event, cliName) => {
+ipcMain.on('search-name', async (event, cliSearch) => {
+    const cleanCPF = cliSearch.replace(/[^\d]/g, '')
     // teste de recebimento do nome do cliente (passo2)
-    console.log(cliName)
+    console.log(cliSearch)
     try {
         // Passos 3 e 4 (busca dos dados do cliente pelo nome)
-        // RegExp (expressão regular 'i' -> insensitive (ignorar letra smaiúsculas ou minúsculas))
+        // RegExp (expressão regular 'i' -> insensitive (ignorar letras maiúsculas ou minúsculas)
         const client = await clientModel.find({
-            nomeCliente: new RegExp(cliName, 'i')
+            $or: [
+                { nomeCliente: new RegExp(cliSearch, 'i') },
+                { cpfCliente: cleanCPF }
+            ]
         })
         // teste da busca do cliente pelo nome (passos 3 e 4)
         console.log(client)
@@ -384,11 +388,11 @@ ipcMain.on('search-name', async (event, cliName) => {
                 // se o botão sim for pressionado
                 if (result.response === 0) {
                     // enviar ao rendererCliente um pedido para recortar e copiar o nome do cliente do campo de busca para o campo nome (evitar que o usuário digite o nome novamente)
-                    event.reply('set-name')
+                    event.reply('set-search', cliSearch)
                 } else {
                     // enviar ao rendererCliente um pedido para limpar os campos (reutilzar a api do preload 'reset-form')
-                event.reply('reset-form')
-                }                
+                    event.reply('reset-form')
+                }
             })
         } else {
             // enviar ao renderizador (rendererCliente) os dados do cliente (passo 5) OBS: não esquecer de converter para string "JSON.stringify"
