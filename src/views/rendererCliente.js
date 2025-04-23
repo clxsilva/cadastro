@@ -95,7 +95,7 @@ api.setSearch((event, searchValue) => {
     if (pareceCPF) {
         cpfClient.value = cleanValue
         cpfClient.focus()
-        cpfClient.style.border = '2px solid red'
+        // cpfClient.style.border = '2px solid red'
     } else {
         nameClient.value = searchValue
         nameClient.focus()
