@@ -72,6 +72,7 @@ frmClient.addEventListener('submit', async (event) => {
         cityCli: cityClient.value,
         ufCli: ufClient.value
     }
+    restaurarEnter()
     // Enviar ao main o objeto client - (Passo 2: fluxo)
     // uso do preload.js
     api.newClient(client)
@@ -100,6 +101,7 @@ api.setSearch((event, searchValue) => {
         nameClient.value = searchValue
         nameClient.focus()
     }
+    restaurarEnter()
 })
 
 function searchName() {
@@ -109,6 +111,7 @@ function searchName() {
     console.log(cliName) // teste do passo 1
     // validação de campo obrigatório
     // se o campo de busca não foi preenchido
+
     if (cliName === "") {
         // enviar ao main um pedido para alertar o usuário
         // precisa usar o preload.js
@@ -163,3 +166,28 @@ window.api.setCPF((event, cpf) => {
     cpfField.focus()
     cpfField.style.border = '2px solid red'
 })
+
+// ============================================================
+// == Manipulação do Enter ====================================
+
+function teclaEnter(event) {
+    if (event.key === "Enter") {
+        event.preventDefault() // ignorar o comportamento padrão
+        // executar um método de busca do cliente
+        searchName()
+    }
+}
+
+// "Escuta" do teclado ('keydown' = pressionar tecla) 
+frmClient.addEventListener('keydown', teclaEnter)
+
+// Função para restaurar o padrão (tecla enter)
+function restaurarEnter() {
+    frmClient.removeEventListener('keydown', teclaEnter)
+}
+
+// == Fim-  Manipulação do Enter===============================
+// ============================================================
+
+// ============================================================
+// == Manipulação do Enter ====================================
