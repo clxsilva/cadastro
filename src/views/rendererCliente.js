@@ -31,6 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Desativar os botões
     btnUpdate.disabled = true
     btnDelete.disabled = true
+    // Ativar o botão adicionar
+    btnCreate.disabled = false
     // Foco na busca do cliente
     foco.focus()
 })
@@ -48,6 +50,30 @@ let complementClient = document.getElementById('inputComplementClient')
 let neighborhoodClient = document.getElementById('inputNeighborhoodClient')
 let cityClient = document.getElementById('inputCityClient')
 let ufClient = document.getElementById('inputUFClient')
+let idClient = document.getElementById('inputIdClient')
+
+// ============================================================
+// == Manipulação do Enter ====================================
+
+function teclaEnter(event) {
+    if (event.key === "Enter") {
+        event.preventDefault() // ignorar o comportamento padrão
+        // executar o método de busca do cliente
+        searchName()
+    }
+}
+
+// "Escuta" do teclado ('keydown' = pressionar tecla)
+frmClient.addEventListener('keydown', teclaEnter)
+
+// função para restaurar o padrão (tecla Enter)
+function restaurarEnter() {
+    frmClient.removeEventListener('keydown', teclaEnter)
+}
+
+// == Fim - Manipulação do Enter ==============================
+// ============================================================
+
 
 // ============================================================
 // == CRUD Create/Update ======================================
@@ -57,25 +83,53 @@ frmClient.addEventListener('submit', async (event) => {
     //evitar o comportamento padrão do submit que é enviar os dados do formulário e reiniciar o documento html
     event.preventDefault()
     // Teste importante (recebimento dos dados do formuláro - passo 1 do fluxo)
-    console.log(nameClient.value, cpfClient.value, emailClient.value, phoneClient.value, cepClient.value, addressClient.value, numberClient.value, complementClient.value, neighborhoodClient.value, cityClient.value, ufClient.value)
+    //console.log(nameClient.value, cpfClient.value, emailClient.value, phoneClient.value, cepClient.value, addressClient.value, numberClient.value, complementClient.value, neighborhoodClient.value, cityClient.value, ufClient.value)
     //Criar um objeto para armazenar os dados do cliente antes de enviar ao main
-    const client = {
-        nameCli: nameClient.value,
-        cpfCli: cpfClient.value,
-        emailCli: emailClient.value,
-        phoneCli: phoneClient.value,
-        cepCli: cepClient.value,
-        addressCli: addressClient.value,
-        numberCli: numberClient.value,
-        complementCli: complementClient.value,
-        neighborhoodCli: neighborhoodClient.value,
-        cityCli: cityClient.value,
-        ufCli: ufClient.value
+
+    // Estratégia para usar o submit para cadastrar um novo cliente ou editar os dados de um cliente já existente
+    // verificar se existe o id do cliente
+    if (idClient.value === "") {
+        // cadastrar um novo cliente
+        const client = {
+            nameCli: nameClient.value,
+            cpfCli: cpfClient.value,
+            emailCli: emailClient.value,
+            phoneCli: phoneClient.value,
+            cepCli: cepClient.value,
+            addressCli: addressClient.value,
+            numberCli: numberClient.value,
+            complementCli: complementClient.value,
+            neighborhoodCli: neighborhoodClient.value,
+            cityCli: cityClient.value,
+            ufCli: ufClient.value
+        }
+        restaurarEnter()
+        // Enviar ao main o objeto client - (Passo 2: fluxo)
+        // uso do preload.js
+        api.newClient(client)
+    } else {
+        // alterar os dados de um cliente existente
+        // teste de validação do id
+        //console.log(idClient.value)
+        // editar um cliente existente
+        const client = {
+            idCli: idClient.value,
+            nameCli: nameClient.value,
+            cpfCli: cpfClient.value,
+            emailCli: emailClient.value,
+            phoneCli: phoneClient.value,
+            cepCli: cepClient.value,
+            addressCli: addressClient.value,
+            numberCli: numberClient.value,
+            complementCli: complementClient.value,
+            neighborhoodCli: neighborhoodClient.value,
+            cityCli: cityClient.value,
+            ufCli: ufClient.value
+        }
+        // Enviar ao main o objeto client - (Passo 2: fluxo)
+        // uso do preload.js
+        api.updateClient(client)
     }
-    restaurarEnter()
-    // Enviar ao main o objeto client - (Passo 2: fluxo)
-    // uso do preload.js
-    api.newClient(client)
 })
 
 // == Fim CRUD Create/Update ==================================
@@ -111,7 +165,6 @@ function searchName() {
     console.log(cliName) // teste do passo 1
     // validação de campo obrigatório
     // se o campo de busca não foi preenchido
-
     if (cliName === "") {
         // enviar ao main um pedido para alertar o usuário
         // precisa usar o preload.js
@@ -128,6 +181,7 @@ function searchName() {
             arrayClient = clientData
             // uso do forEach para percorrer o vetor e extrair os dados
             arrayClient.forEach((c) => {
+                idClient.value = c._id
                 nameClient.value = c.nomeCliente
                 cpfClient.value = c.cpfCliente
                 emailClient.value = c.emailCliente
@@ -139,6 +193,13 @@ function searchName() {
                 neighborhoodClient.value = c.bairroCliente
                 cityClient.value = c.cidadeCliente
                 ufClient.value = c.ufCliente
+                // restaurar a tecla Enter
+                restaurarEnter()
+                // desativar o botão adicionar
+                btnCreate.disabled = true
+                // ativar os botões editar e excluir
+                btnUpdate.disabled = false
+                btnDelete.disabled = false
             })
         })
     }
@@ -147,6 +208,17 @@ function searchName() {
 // == Fim - CRUD Read =========================================
 // ============================================================
 
+// ============================================================
+// == CRUD Delete =============================================
+
+function removeClient() {
+    //console.log(idClient.value) // teste do Passo 1
+    // Passo 2 - Envio do id para o main
+    api.deleteClient(idClient.value)
+}
+
+// == Fim - CRUD Delete =======================================
+// ============================================================
 
 // ============================================================
 // == Reset Form ==============================================

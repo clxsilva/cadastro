@@ -35,3 +35,8 @@ footer p {
     padding-top: 7px;
     font-size: 1.2em;    
 }
+
+/* Ocultar o id do cliente */
+#inputIdClient {
+    display: none;
+}
