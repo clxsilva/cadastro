@@ -199,12 +199,26 @@ ipcMain.on('client-window', () => {
 // ============================================================
 // == Clientes - CRUD Create
 // recebimento do objeto que contem os dados do cliente
+
 ipcMain.on('new-client', async (event, client) => {
-    // Importante! Teste de recebimento dos dados do cliente
+    // Teste de recebimento dos dados do cliente
     console.log(client)
+
+    // Validar CPF antes de continuar
+    if (!validarCPF(client.cpfCli)) {
+        // Se o CPF for inválido, exibe uma mensagem de erro
+        dialog.showMessageBox({
+            type: 'error',
+            title: "Atenção!",
+            message: "CPF inválido. O cadastro não será realizado.",
+            buttons: ['OK']
+        });
+        return;  // Não prosseguir com o cadastro
+    }
+
     // Cadastrar a estrutura de dados no banco de dados MongoDB
     try {
-        // criar uma nova de estrutura de dados usando a classe modelo. Atenção! Os atributos precisam ser idênticos ao modelo de dados Clientes.js e os valores são definidos pelo conteúdo do objeto cliente
+        // Criar uma nova estrutura de dados usando a classe modelo
         const newClient = new clientModel({
             nomeCliente: client.nameCli,
             cpfCliente: client.cpfCli.replace(/[^\d]/g, ''), // Remove a pontuação do CPF
@@ -218,9 +232,11 @@ ipcMain.on('new-client', async (event, client) => {
             cidadeCliente: client.cityCli,
             ufCliente: client.ufCli
         })
-        // salvar os dados do cliente no banco de dados
+        
+        // Salvar os dados do cliente no banco de dados
         await newClient.save()
-        //confirmação de cliente adicionado no banco
+
+        // Confirmação de cliente adicionado no banco
         dialog.showMessageBox({
             type: 'info',
             title: "Aviso",
@@ -228,11 +244,11 @@ ipcMain.on('new-client', async (event, client) => {
             buttons: ['OK']
         }).then((result) => {
             if (result.response === 0) {
-                event.reply('reset-form')
+                event.reply('reset-form') // Limpar o formulário
             }
         })
     } catch (error) {
-        //tratamento da excessão "CPF duplicado"
+        // Tratamento da exceção "CPF duplicado"
         if (error.code === 11000) {
             dialog.showMessageBox({
                 type: 'error',
@@ -240,9 +256,8 @@ ipcMain.on('new-client', async (event, client) => {
                 message: "CPF já cadastrado.\nVerifique o número digitado.",
                 buttons: ['OK']
             }).then((result) => {
-                // se o botão OK for pressionado
                 if (result.response === 0) {
-                    //Limpar o campo CPF, foco e borda em vermelho
+                    // Limpar o campo CPF, foco e borda em vermelho
                 }
             })
         } else {
@@ -410,20 +425,35 @@ ipcMain.on('search-name', async (event, cliSearch) => {
 // == CRUD Delete =============================================
 
 ipcMain.on('delete-client', async (event, id) => {
-    //console.log(id) //teste do passo 2
-    // confirmação antes de excluir
+    // Exibe uma caixa de diálogo para confirmar a exclusão
     const result = await dialog.showMessageBox(win, {
         type: 'warning',
         title: "Atenção!",
         message: "Tem certeza que deseja excluir este cliente?\nEsta ação não poderá ser desfeita.",
         buttons: ['Cancelar', 'Excluir']
-    })
+    });
+
     if (result.response === 1) {
+        // Exclui o cliente no banco de dados
         try {
-            const delClient = await clientModel.findByIdAndDelete(id)
+            const delClient = await clientModel.findByIdAndDelete(id);
+            // Exibe uma caixa de mensagem de sucesso após a exclusão
+            dialog.showMessageBox({
+                type: 'info',
+                title: "Sucesso",
+                message: "Cliente excluído com sucesso!",
+                buttons: ['OK']
+            });
+            event.reply('client-deleted', true) // Envia a resposta ao frontend
             event.reply('reset-form')
         } catch (error) {
-            console.log(error)
+            console.error(error)
+            dialog.showMessageBox({
+                type: 'error',
+                title: "Erro",
+                message: "Não foi possível excluir o cliente. Tente novamente.",
+                buttons: ['OK']
+            })
         }
     }
 })
@@ -431,12 +461,40 @@ ipcMain.on('delete-client', async (event, id) => {
 // == Fim - Crud delete =======================================
 // ============================================================
 
+// ============================================================
+// == CRUD - Editar ===========================================
+
 ipcMain.on('update-client', async (event, client) => {
-    // Importante! Teste de recebimento dos dados do cliente
-    console.log(client)
-    // Alterar a estrutura de dados no banco de dados MongoDB
+    console.log(client);
+
+    // Verifica se o CPF inserido é válido
+    if (!validarCPF(client.cpfCli)) {
+        // Caso o CPF seja inválido, bloqueia a edição
+        dialog.showMessageBox({
+            type: 'error',
+            title: "Atenção!",
+            message: "CPF inválido. A edição não será permitida.",
+            buttons: ['OK']
+        });
+        return;
+    }
+
     try {
-        // criar uma nova de estrutura de dados usando a classe modelo. Atenção! Os atributos precisam ser idênticos ao modelo de dados Clientes.js e os valores são definidos pelo conteúdo do objeto cliente
+        // Verifica se o CPF já está cadastrado no banco
+        const existingClient = await clientModel.findOne({ cpfCliente: client.cpfCli });
+
+        // Se o CPF for encontrado e não for o mesmo cliente (diferença no ID), bloqueia a edição
+        if (existingClient && existingClient._id.toString() !== client.idCli) {
+            dialog.showMessageBox({
+                type: 'error',
+                title: "Atenção!",
+                message: "Este CPF já está vinculado a outro cliente. Edição não permitida.",
+                buttons: ['OK']
+            });
+            return;
+        }
+
+        // Permite editar caso o CPF seja válido e não esteja vinculado a outro cliente
         const updateClient = await clientModel.findByIdAndUpdate(
             client.idCli,
             {
@@ -452,40 +510,56 @@ ipcMain.on('update-client', async (event, client) => {
                 cidadeCliente: client.cityCli,
                 ufCliente: client.ufCli
             },
-            {
-                new: true
-            }
-        )
-        // mensagem de confirmação
+            { new: true }
+        );
+
         dialog.showMessageBox({
             type: 'info',
             title: "Aviso",
-            message: "Dados do cliente alterados com sucesso",
+            message: "Dados do cliente alterados com sucesso.",
             buttons: ['OK']
         }).then((result) => {
             if (result.response === 0) {
-                event.reply('reset-form')
+                event.reply('reset-form');
             }
-        })
+        });
+
     } catch (error) {
-        //tratamento da excessão "CPF duplicado"
-        if (error.code === 11000) {
-            dialog.showMessageBox({
-                type: 'error',
-                title: "Atenção!",
-                message: "CPF já cadastrado.\nVerifique o número digitado.",
-                buttons: ['OK']
-            }).then((result) => {
-                // se o botão OK for pressionado
-                if (result.response === 0) {
-                    //Limpar o campo CPF, foco e borda em vermelho
-                }
-            })
-        } else {
-            console.log(error)
-        }
+        console.log(error);
+        dialog.showMessageBox({
+            type: 'error',
+            title: "Erro!",
+            message: "Erro ao tentar atualizar os dados do cliente.",
+            buttons: ['OK']
+        });
     }
-})
+});
+
+
+function validarCPF(cpf) {
+    cpf = cpf.replace(/\D/g, ''); // Remove caracteres não numéricos
+
+    if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false; // Verifica CPF com números repetidos
+
+    let soma = 0;
+    let resto;
+
+    // Validação do primeiro dígito
+    for (let i = 1; i <= 9; i++) soma += parseInt(cpf[i - 1]) * (11 - i);
+    resto = (soma * 10) % 11;
+    if (resto === 10 || resto === 11) resto = 0;
+    if (resto !== parseInt(cpf[9])) return false;
+
+    soma = 0;
+
+    // Validação do segundo dígito
+    for (let i = 1; i <= 10; i++) soma += parseInt(cpf[i - 1]) * (12 - i);
+    resto = (soma * 10) % 11;
+    if (resto === 10 || resto === 11) resto = 0;
+    if (resto !== parseInt(cpf[10])) return false;
+
+    return true;
+}
 
 // == Fim - Crud update =======================================
 // ============================================================
